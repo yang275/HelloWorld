@@ -1,0 +1,139 @@
+https://www.linuxidc.com/
+
+
+
+
+CentOS 7防火墙快速开放端口配置方法
+
+开启端口
+[root@centos7 ~]# firewall-cmd --zone=public --add-port=80/tcp --permanent
+查询端口号80 是否开启：
+[root@centos7 ~]# firewall-cmd --query-port=80/tcp
+
+重启防火墙：
+
+[root@centos7 ~]# firewall-cmd --reload
+
+查询有哪些端口是开启的:
+
+[root@centos7 ~]# firewall-cmd --list-port
+
+命令含义：
+
+
+--zone #作用域
+--add-port=80/tcp #添加端口，格式为：端口/通讯协议
+--permanent #永久生效，没有此参数重启后失效
+
+关闭firewall：
+
+systemctl stop firewalld.service #停止firewall
+
+systemctl disable firewalld.service #禁止firewall开机启动
+————————————————————————————————————————————
+CentOS 7安装 MySQL 8.0
+
+安装Mysql有两种方式：
+
+    直接下载官方的源（比较慢）
+
+https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm # 下载rpm包
+yum localinstall mysql80-community-release-el7-1.noarch.rpm # 处理相关依赖
+yum install mysql-community-server # 安装
+
+    用163的源，分开安装
+
+wget https://mirrors.163.com/mysql/Downloads/MySQL-8.0/mysql-community-common-8.0.18-1.el7.x86_64.rpm
+wget https://mirrors.163.com/mysql/Downloads/MySQL-8.0/mysql-community-libs-8.0.18-1.el7.x86_64.rpm
+wget https://mirrors.163.com/mysql/Downloads/MySQL-8.0/mysql-community-client-8.0.18-1.el7.x86_64.rpm
+wget https://mirrors.163.com/mysql/Downloads/MySQL-8.0/mysql-community-server-8.0.18-1.el7.x86_64.rpm
+
+rpm -ivh mysql-community-common-8.0.18-1.el7.x86_64.rpm  # rpm下载
+rpm -ivh mysql-community-libs-8.0.18-1.el7.x86_64.rpm
+rpm -ivh mysql-community-client-8.0.18-1.el7.x86_64.rpm
+rpm -ivh mysql-community-server-8.0.18-1.el7.x86_64.rpm
+
+
+重启Mysql
+
+service mysqld start
+
+查看Mysql默认密码
+
+cat /var/log/mysqld.log | grep password
+
+登录
+
+mysql -uroot -p # 回车，复制上面的密码即可
+
+二. Navicat连接Mysql
+
+连接mysql之前，先修改下root的密码
+
+set global validate_password.policy=0; #修改策略
+set global validate_password.length=1; 
+alter user 'root'@'localhost' identified with mysql_native_password by '12345678'; # 测试环境，密码可以简单点，Mysql8.0必须用mysql_native_password给账号加密
+
+可以exit退出，重新登录看看。
+
+修改root账号的Host，便于IP连接
+
+use mysql; #mysql的基础表
+update user set Host = '%' where User='root'; # 正式环境，可以创建新的Mysql账号，设置成具体的ip
+
+开放3306端口
+
+firewall-cmd --add-port=3306/tcp --permanent
+firewall-cmd --reload
+
+
+——————————————————————————————————————————————————
+The following has been tested against IntelliJ IDEA 2016.2.2
+Steps
+
+Within your locally cloned spring-framework working directory:
+
+  1  Precompile spring-oxm with ./gradlew :spring-oxm:compileTestJava
+   2 Import into IntelliJ (File -> New -> Project from Existing Sources -> Navigate to directory -> Select build.gradle)
+   3 When prompted exclude the spring-aspects module (or after the import via File-> Project Structure -> Modules)
+  4  Code away
+
+
+
+
+
+
+
+ 在首行即plugins上方，buildscript里面加入
+repositories {
+        maven{ url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven{ url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+}
+
+
+在 resolutionStrategy的下方，configurations.all的上方加入
+
+		repositories {
+			maven{ url 'https://maven.aliyun.com/nexus/content/groups/public/'}
+        	maven{ url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+			mavenCentral()
+			maven { url "https://repo.spring.io/libs-spring-framework-build" }
+	}
+
+
+gradlew.bat :spring-oxm:compileTestJava
+
+
+Execution failed for task ':buildSrc:compileJava'.
+Could not resolve all files for configuration ':buildSrc:compileClasspath'.
+Could not download guava.jar (com.google.guava:guava:18.0)
+Could not get resource 'https://repo.maven.apache.org/maven2/com/google/guava/guava/18.0/guava-18.0.jar'.
+Read timed out
+GRADLE_USER_HOME
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output. Run with --scan to get full insights.
+
+* Get more help at https://help.gradle.org
+
+
+
